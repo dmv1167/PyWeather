@@ -3,7 +3,7 @@ Author: Dominic Vinciulla
 open_weather.py uses openweathermap.org api to display real-time weather information
 from the Rochester area to a 480 by 320 screen
 """
-import os
+
 import time, urllib.request, PySimpleGUI as gui
 from json import loads
 from datetime import datetime, timedelta
@@ -119,10 +119,10 @@ def updateWindow(apiInfo: tuple, lastValues: dict) -> None:
     else:
         index = 0
 
-    window['-SELECTOR-'].update(values=dates, set_to_index=index)
 
     # organize necessary info into dict
-    if index != 0:
+    if index != 0 and weatherJson:
+        window['-SELECTOR-'].update(values=dates, set_to_index=index)
         info = {
             '-TEMP-': str(int(weatherJson['list'][index]['temp']['day'])) + u'\xb0',
             '-FEELS-': 'Feels like: ' + str(int(weatherJson['list'][index]['feels_like']['day'])) + u'\xb0',
@@ -145,11 +145,14 @@ def updateWindow(apiInfo: tuple, lastValues: dict) -> None:
             '-DESC-': ' '.join([word[0].upper() + word[1:] for word in (currentJson['weather'][0]['description']).split(' ')]).strip()
         }
     info.update({
-        '-CITY-':weatherJson['city']['name'],
-        '-HIGH-':str(int(weatherJson['list'][index]['temp']['max'])) + u'\xb0',
-        '-LOW-':str(int(weatherJson['list'][index]['temp']['min'])) + u'\xb0',
         '-DATE-':now.strftime('%A, %B') + ' ' + suffix(now.day) + '  |  ' + now.strftime('%I:%M %p')
     })
+    if weatherJson:
+        info.update({
+            '-CITY-':weatherJson['city']['name'],
+            '-HIGH-':str(int(weatherJson['list'][index]['temp']['max'])) + u'\xb0',
+            '-LOW-':str(int(weatherJson['list'][index]['temp']['min'])) + u'\xb0',
+        })
 
     # iterate dict and update each value
     # change temp value colors to reflect temperature
@@ -195,8 +198,8 @@ while True:
         start = time.time()
         time.sleep(0.01)
         data = callApi()
-        if not (data[0] and data[1]):
-            continue
+        # if not (data[0] and data[1]):
+        #     continue
         time_info = data[1]['sys']
         sunset = time_info['sunset']
         sunrise = time_info['sunrise']
