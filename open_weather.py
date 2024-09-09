@@ -3,14 +3,18 @@ Author: Dominic Vinciulla
 open_weather.py uses openweathermap.org api to display real-time weather information
 from the Rochester area to a 480 by 320 screen
 """
-
+import os
 import time, urllib.request, PySimpleGUI as gui
 from json import loads
 from datetime import datetime, timedelta
+from dotenv import dotenv_values
+
+
+values = dotenv_values(".env")
 
 DAYCOUNT = 7
-FORECAST = f'https://api.openweathermap.org/data/2.5/forecast/daily?q=Rochester,US&cnt={DAYCOUNT}&APPID=de2c4bfd00d63c1d7e6b50ca8bdea879'
-CURRENT = 'https://api.openweathermap.org/data/2.5/weather?q=Rochester,US&APPID=69508da80a35f2cc71de24804c5d9a7e'
+FORECAST = f'https://api.openweathermap.org/data/2.5/forecast/daily?q={values["CITY"]}&cnt={DAYCOUNT}&APPID={values["API_KEY"]}'
+CURRENT = f'https://api.openweathermap.org/data/2.5/weather?q={values["CITY"]}&APPID={values["API_KEY"]}'
 
 def getPage(url: str):
     """
